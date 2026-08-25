@@ -1,0 +1,16 @@
+# Course materials (not for the public repo)
+course-materials/
+
+# Virtual environment
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS / editor junk
+.DS_Store
+.idea/
+.vscode/
