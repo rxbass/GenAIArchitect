@@ -1,0 +1,26 @@
+{
+  "date": "2026-08-26",
+  "total": 2,
+  "results": [
+    {
+      "name": "Jo",
+      "phone": "919500182664",
+      "message": "Hi Jo, Sending you the automated message!",
+      "status": "sent_unconfirmed",
+      "sent_at": "2026-08-26 12:05:02",
+      "screenshot": "screenshots\\Jo_2026-08-26.png",
+      "last_messages": [],
+      "error": null
+    },
+    {
+      "name": "Sankar",
+      "phone": "919790197977",
+      "message": "Ignore this automated message! Sankar",
+      "status": "sent_unconfirmed",
+      "sent_at": "2026-08-26 12:05:45",
+      "screenshot": "screenshots\\Sankar_2026-08-26.png",
+      "last_messages": [],
+      "error": null
+    }
+  ]
+}

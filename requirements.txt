@@ -5,6 +5,7 @@ colorama==0.4.6
 comm==0.2.3
 debugpy==1.8.21
 executing==2.2.1
+greenlet==3.5.5
 idna==3.19
 ipykernel==7.3.0
 ipython==9.16.1
@@ -19,10 +20,12 @@ packaging==26.3
 parso==0.8.7
 pillow==12.3.0
 platformdirs==4.11.3
+playwright==1.62.0
 prompt_toolkit==3.0.53
 psutil==7.2.2
 pure_eval==0.2.3
 PyAutoGUI==0.9.54
+pyee==13.0.1
 PyGetWindow==0.0.9
 Pygments==2.21.0
 PyMsgBox==2.0.1

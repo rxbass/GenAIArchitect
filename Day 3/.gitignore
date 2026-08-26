@@ -1,0 +1,25 @@
+# ---- WhatsApp Web session (NEVER commit) ----
+# Contains your logged-in browser profile: cookies and auth tokens.
+# Committing this would push your WhatsApp login to the repo.
+whatsapp_session/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+myenv/
+.venv/
+
+# ---- OS / editor cruft ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ---- Kept on purpose (do NOT ignore) ----
+# Screenshots (*.png), Excel files (*.xlsx), and JSON reports are
+# tracked so reviewers can see sample output. Leave them in the repo.
