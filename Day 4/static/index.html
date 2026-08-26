@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tape — a calculator</title>
+<style>
+  /* ---------- design tokens ---------- */
+  :root {
+    --ink:        #1c1a17;   /* near-black warm ink        */
+    --paper:      #f5f1e6;   /* tape paper                 */
+    --paper-line: #e7e0cd;   /* faint ruling on the tape   */
+    --machine:    #2b2620;   /* calculator body            */
+    --machine-hi: #3a342c;   /* raised key face            */
+    --key:        #efe9db;   /* light key                  */
+    --key-op:     #c66b3d;   /* operator key — burnt amber */
+    --key-fn:     #6b7d6a;   /* function key — muted sage  */
+    --accent:     #c66b3d;
+    --danger:     #a23c2e;
+    --shadow:     rgba(20,16,10,0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background:
+      radial-gradient(circle at 30% 20%, #423a30 0%, #211d18 60%, #17130f 100%);
+    font-family: "Courier New", Courier, monospace;
+    color: var(--ink);
+  }
+
+  .machine {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(180deg, var(--machine-hi), var(--machine));
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow:
+      0 24px 60px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    color: var(--paper);
+    margin-bottom: 16px;
+    letter-spacing: 0.02em;
+  }
+  .brand h1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: lowercase;
+  }
+  .brand span {
+    font-size: 0.68rem;
+    opacity: 0.55;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- paper tape ---------- */
+  .tape {
+    background: var(--paper);
+    background-image: repeating-linear-gradient(
+      var(--paper) 0 27px, var(--paper-line) 27px 28px);
+    border-radius: 6px 6px 0 0;
+    height: 150px;
+    overflow-y: auto;
+    padding: 8px 12px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .tape-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    line-height: 28px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+  .tape-row .expr { color: #6a625020; color: #6f6552; overflow: hidden; text-overflow: ellipsis; }
+  .tape-row .val  { color: var(--ink); font-weight: 700; }
+  .tape-row.err .val { color: var(--danger); }
+
+  /* ---------- current display ---------- */
+  .display {
+    background: #12100d;
+    color: var(--paper);
+    border-radius: 0 0 6px 6px;
+    padding: 14px 14px 16px;
+    text-align: right;
+    min-height: 62px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: inset 0 -2px 10px rgba(0,0,0,0.5);
+  }
+  .display .entry {
+    font-size: 1.35rem;
+    min-height: 1.5rem;
+    word-break: break-all;
+    letter-spacing: 0.01em;
+  }
+  .display .preview {
+    font-size: 0.8rem;
+    color: var(--accent);
+    min-height: 1rem;
+    opacity: 0.85;
+  }
+
+  /* ---------- keypad ---------- */
+  .keys {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
+  }
+  button.key {
+    appearance: none;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 0;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: linear-gradient(180deg, #fff8ea, var(--key));
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.35), 0 4px 6px rgba(0,0,0,0.25);
+    transition: transform 0.04s ease, box-shadow 0.04s ease;
+    user-select: none;
+  }
+  button.key:active {
+    transform: translateY(3px);
+    box-shadow: 0 0 0 rgba(0,0,0,0.35);
+  }
+  button.key.op  { background: linear-gradient(180deg,#e08a5b,var(--key-op)); color:#fff; }
+  button.key.fn  { background: linear-gradient(180deg,#83947f,var(--key-fn)); color:#fff; font-size:0.9rem; }
+  button.key.eq  { background: linear-gradient(180deg,#d77a49,#b4551f); color:#fff; grid-row: span 2; }
+  button.key.wide { grid-column: span 2; }
+  button.key.clear { color: var(--danger); }
+
+  .hint {
+    margin-top: 12px;
+    text-align: center;
+    color: rgba(245,241,230,0.4);
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+  <main class="machine">
+    <div class="brand">
+      <h1>tape</h1>
+      <span>fastapi calc</span>
+    </div>
+
+    <div class="tape" id="tape"><!-- history rows injected here --></div>
+
+    <div class="display">
+      <div class="entry" id="entry">0</div>
+      <div class="preview" id="preview"></div>
+    </div>
+
+    <div class="keys" id="keys">
+      <button class="key fn" data-ins="sqrt(">√</button>
+      <button class="key fn" data-ins="(">(</button>
+      <button class="key fn" data-ins=")">)</button>
+      <button class="key clear" data-action="clear">AC</button>
+
+      <button class="key fn" data-ins="sin(">sin</button>
+      <button class="key fn" data-ins="cos(">cos</button>
+      <button class="key fn" data-ins="tan(">tan</button>
+      <button class="key op" data-ins="/">÷</button>
+
+      <button class="key" data-ins="7">7</button>
+      <button class="key" data-ins="8">8</button>
+      <button class="key" data-ins="9">9</button>
+      <button class="key op" data-ins="*">×</button>
+
+      <button class="key" data-ins="4">4</button>
+      <button class="key" data-ins="5">5</button>
+      <button class="key" data-ins="6">6</button>
+      <button class="key op" data-ins="-">−</button>
+
+      <button class="key" data-ins="1">1</button>
+      <button class="key" data-ins="2">2</button>
+      <button class="key" data-ins="3">3</button>
+      <button class="key op" data-ins="+">+</button>
+
+      <button class="key" data-ins="0">0</button>
+      <button class="key" data-ins=".">.</button>
+      <button class="key" data-action="back">⌫</button>
+      <button class="key eq" data-action="equals">=</button>
+
+      <button class="key fn" data-ins="pi">π</button>
+      <button class="key fn" data-ins="e">e</button>
+      <button class="key fn" data-ins="log(">log</button>
+      <button class="key fn" data-ins="**">xʸ</button>
+    </div>
+
+    <p class="hint">type on your keyboard too · Enter = · Esc clears</p>
+  </main>
+
+<script>
+  const entryEl   = document.getElementById('entry');
+  const previewEl = document.getElementById('preview');
+  const tapeEl    = document.getElementById('tape');
+
+  let expr = "";
+
+  function render() {
+    entryEl.textContent = expr || "0";
+    livePreview();
+  }
+
+  // Ask the API for a live preview of the current expression (debounced).
+  let previewTimer = null;
+  function livePreview() {
+    clearTimeout(previewTimer);
+    if (!expr.trim()) { previewEl.textContent = ""; return; }
+    previewTimer = setTimeout(async () => {
+      try {
+        const r = await fetch('/calculate?expression=' + encodeURIComponent(expr));
+        if (!r.ok) { previewEl.textContent = ""; return; }
+        const data = await r.json();
+        previewEl.textContent = "= " + format(data.result);
+      } catch { previewEl.textContent = ""; }
+    }, 180);
+  }
+
+  function format(n) {
+    if (typeof n !== 'number') return n;
+    if (Number.isInteger(n)) return n.toString();
+    return parseFloat(n.toFixed(10)).toString();  // trim float noise
+  }
+
+  function addTape(expression, value, isError) {
+    const row = document.createElement('div');
+    row.className = 'tape-row' + (isError ? ' err' : '');
+    row.innerHTML =
+      '<span class="expr">' + expression + '</span>' +
+      '<span class="val">' + (isError ? 'error' : format(value)) + '</span>';
+    tapeEl.appendChild(row);
+    tapeEl.scrollTop = tapeEl.scrollHeight;
+  }
+
+  async function equals() {
+    if (!expr.trim()) return;
+    try {
+      const r = await fetch('/calculate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ expression: expr })
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        addTape(expr, null, true);
+      } else {
+        addTape(expr, data.result, false);
+        expr = format(data.result).toString();   // chain from the result
+      }
+    } catch {
+      addTape(expr, null, true);
+    }
+    render();
+  }
+
+  function press(key) {
+    const ins = key.dataset.ins;
+    const action = key.dataset.action;
+    if (ins !== undefined) {
+      if (expr === "0") expr = "";
+      expr += ins;
+      render();
+    } else if (action === 'clear') {
+      expr = ""; previewEl.textContent = ""; render();
+    } else if (action === 'back') {
+      expr = expr.slice(0, -1); render();
+    } else if (action === 'equals') {
+      equals();
+    }
+  }
+
+  document.getElementById('keys').addEventListener('click', (e) => {
+    const btn = e.target.closest('button.key');
+    if (btn) press(btn);
+  });
+
+  // Keyboard support
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); equals(); return; }
+    if (e.key === 'Escape') { expr = ""; previewEl.textContent=""; render(); return; }
+    if (e.key === 'Backspace') { expr = expr.slice(0, -1); render(); return; }
+    if (/^[0-9+\-*/().%]$/.test(e.key)) {
+      if (expr === "0") expr = "";
+      expr += e.key; render();
+    }
+  });
+
+  render();
+</script>
+</body>
+</html>
