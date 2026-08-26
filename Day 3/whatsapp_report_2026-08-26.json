@@ -4,7 +4,7 @@
   "results": [
     {
       "name": "Jo",
-      "phone": "919500182664",
+      "phone": "919876543210",
       "message": "Hi Jo, Sending you the automated message!",
       "status": "sent_unconfirmed",
       "sent_at": "2026-08-26 12:05:02",
@@ -14,7 +14,7 @@
     },
     {
       "name": "Sankar",
-      "phone": "919790197977",
+      "phone": "910987654321",
       "message": "Ignore this automated message! Sankar",
       "status": "sent_unconfirmed",
       "sent_at": "2026-08-26 12:05:45",
