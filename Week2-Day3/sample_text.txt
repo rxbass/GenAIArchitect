@@ -1,0 +1,1 @@
+This is a sample text for data ingestion. It contains multiple sentences and can be used to demonstrate how to process text data in Python. The goal is to extract meaningful information from the text and perform various operations such as tokenization, sentiment analysis, and more.
