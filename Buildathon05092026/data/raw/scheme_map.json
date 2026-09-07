@@ -1,0 +1,14 @@
+{
+  "_comment": [
+    "Document-level metadata, keyed by doc_id (the slugified filename).",
+    "Only put facts here that are true of the WHOLE document. Per-section",
+    "scheme names are detected automatically by ingestion/normalize.py; a",
+    "heuristic must never be asked to infer a document-wide truth.",
+    "Read by ingestion/load_pdf.py:_scheme_hints. Allowed keys:",
+    "scheme_name, scheme_category, state, department."
+  ],
+  "schemes": {
+    "state": "odisha",
+    "department": "Department of Agriculture & Farmers' Empowerment, Government of Odisha"
+  }
+}
