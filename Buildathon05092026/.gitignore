@@ -7,11 +7,7 @@
 .env.local
 *.key
 
-# ── Generated RAG artifacts (large / derivable — not committed) ──
-# The FAISS index and normalized/embedded documents are rebuilt from
-# data/raw/ via `python ingestion/build_index.py`.
-data/processed/
-!data/processed/.gitkeep
+
 
 # ── Source corpus IS committed (judges want to see the docs) ──
 # data/raw/ is intentionally NOT ignored — the scheme PDFs, HTML,
@@ -64,6 +60,9 @@ Thumbs.db
 # ── Logs ──
 *.log
 logs/
+
+# Markdown files
+*.md
 
 # ─────────────────────────────────────────────────────────────
 # NOT ignored (kept on purpose):
