@@ -7,7 +7,8 @@
 .env.local
 *.key
 
-
+# Markdown files
+*.md
 
 # ── Source corpus IS committed (judges want to see the docs) ──
 # data/raw/ is intentionally NOT ignored — the scheme PDFs, HTML,
@@ -61,8 +62,7 @@ Thumbs.db
 *.log
 logs/
 
-# Markdown files
-*.md
+
 
 # ─────────────────────────────────────────────────────────────
 # NOT ignored (kept on purpose):
